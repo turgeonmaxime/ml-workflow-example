@@ -1,0 +1,41 @@
+---
+title: "Initial data exploration"
+date: today
+date-format: medium
+execute:
+    echo: false
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(cowplot)
+library(pheatmap)
+library(scico)
+
+# These env variables are set by the calling script
+infile <- paste0("../../", Sys.getenv("REPORT_INFILE"))
+target_name <- Sys.getenv("REPORT_TARGET")
+
+dataset <- readr::read_csv(infile)
+glimpse(dataset)
+```
+
+
+```{r}
+dataset |> 
+    ggplot(aes(x = !!ensym(target_name))) +
+    geom_histogram() + 
+    theme_cowplot() +
+    labs(title = paste("Histogram of", target_name))
+```
+
+```{r}
+#| fig-cap: "Heatmap of numerical variables"
+ncol <- 100
+dataset |> 
+    select(where(is.numeric)) |> 
+    cor() |> 
+    pheatmap(color = scico(n = ncol, palette = "vik", direction = -1),
+             breaks = seq(-1, 1, length.out = ncol + 1)) 
+```

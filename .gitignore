@@ -4,3 +4,8 @@
 .RData
 .Ruserdata
 .DS_Store
+
+# Artifacts from templates
+inst/template/*files/
+inst/template/*.pdf
+inst/template/*.html
