@@ -1,1 +1,10 @@
 # ml-workflow-example
+
+The goal of this repository is to provide an example of an ML workflow, where we go through the following steps:
+
+  1. Visualize and summarize the data.
+  2. Fit and evaluate multiple models.
+  3. Provide final evaluation of the selected model.
+  4. Make predictions for new observations.
+  
+My objective is containerize the first and the last step of this process. Moreover, the first and third step should produce reports in some form (e.g. HTML or PDF).
