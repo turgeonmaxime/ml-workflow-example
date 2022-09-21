@@ -9,3 +9,5 @@
 inst/template/*files/
 inst/template/*.pdf
 inst/template/*.html
+out.html
+out.pdf

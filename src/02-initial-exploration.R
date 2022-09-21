@@ -44,9 +44,16 @@ if (!args$target %in% names(data)) {
 }
 
 # Render document----
-Sys.setenv(REPORT_INFILE = args$infile,
+tmp_dir <- tempdir()
+Sys.setenv(REPORT_INFILE = paste0(tmp_dir, "/data.csv"),
            REPORT_TARGET = args$target)
 
-quarto::quarto_render("inst/template/initial_data_exploration.qmd",
-                      output_format = file_ext, output_file = args$out,
+system2("cp", c(args$infile, Sys.getenv("REPORT_INFILE")))
+system2("cp", c("inst/template/initial_data_exploration.qmd",
+                paste0(tmp_dir, "/report.qmd")))
+
+quarto::quarto_render(paste0(tmp_dir, "/report.qmd"),
+                      output_format = file_ext, # output_file = args$out,
                       pandoc_args = c("--embed-resources", "--standalone"))
+
+system2("mv", c(paste0(tmp_dir, "/report.", file_ext), args$out))

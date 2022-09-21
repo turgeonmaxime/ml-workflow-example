@@ -16,5 +16,3 @@ This can be done by running the following command from the root directory:
 ```bash
 Rscript src/02-initial-exploration.R data/wage_model.csv --target=wage --out=out.pdf
 ```
-
-At the moment, HTML output causes issues because of (what I believe is) a bug in the `quarto` R package.

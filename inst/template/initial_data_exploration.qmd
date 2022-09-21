@@ -12,17 +12,52 @@ library(tidyverse)
 library(cowplot)
 library(pheatmap)
 library(scico)
+library(moments)
+library(knitr)
 
 # These env variables are set by the calling script
-infile <- paste0("../../", Sys.getenv("REPORT_INFILE"))
+infile <- Sys.getenv("REPORT_INFILE")
 target_name <- Sys.getenv("REPORT_TARGET")
 
 dataset <- readr::read_csv(infile)
 glimpse(dataset)
 ```
 
+```{r}
+var_thresh <- 0.00001
+
+# We convert characters to factors and then to numeric to compute the
+# variance. There may be a better way...
+data_zerovar <- dataset |> 
+    mutate(across(where(is.character), \(.x) as.numeric(as.factor(.x)))) |> 
+    summarise(across(everything(), var, na.rm = TRUE)) |> 
+    pivot_longer(everything(), 
+                 names_to = "feature", 
+                 values_to = "variance") |> 
+    filter(variance < var_thresh) 
+
+if (nrow(data_zerovar) > 0 ) {
+    kable(data_zerovar, caption = "Features with zero variance")
+}
+```
 
 ```{r}
+data_nas <- dataset |> 
+    summarise(across(everything(), \(.x) sum(is.na(.x)))) |> 
+    pivot_longer(everything(), 
+                 names_to = "feature", 
+                 values_to = "n_nas") |> 
+    filter(n_nas > 0) 
+
+if (nrow(data_nas) > 0 ) {
+    data_nas |> 
+        arrange(desc(n_nas)) |> 
+        kable(caption = "Features with missing values")
+}
+```
+
+```{r}
+#| message: false
 dataset |> 
     ggplot(aes(x = !!ensym(target_name))) +
     geom_histogram() + 
@@ -38,4 +73,32 @@ dataset |>
     cor() |> 
     pheatmap(color = scico(n = ncol, palette = "vik", direction = -1),
              breaks = seq(-1, 1, length.out = ncol + 1)) 
+```
+
+```{r}
+data_num_nonnormal <- dataset |> 
+    summarise(across(where(is.numeric), 
+                     list("skewness" = ~skewness(.x, na.rm = TRUE),
+                          "kurtosis" = ~kurtosis(.x, na.rm = TRUE)))) |> 
+    pivot_longer(cols = everything(), 
+                 names_to = c("feature", "measure"),
+                 names_pattern = "(.*)_(.*)",
+                 values_to = "value") |> 
+    pivot_wider(names_from = "measure", values_from = "value") |> 
+    mutate(kurtosis = kurtosis - 3)
+```
+
+```{r}
+data_num_nonnormal |> 
+    arrange(desc(abs(skewness))) |> 
+    slice_head(n = 10) |> 
+    knitr::kable(caption = "Top skewness values (in absolute value)")
+```
+
+```{r}
+data_num_nonnormal |> 
+    arrange(desc(abs(kurtosis))) |> 
+    select(feature, kurtosis, skewness) |> 
+    slice_head(n = 10) |> 
+    knitr::kable(caption = "Top kurtosis values (in absolute value)")
 ```
