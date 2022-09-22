@@ -11,3 +11,5 @@ inst/template/*.pdf
 inst/template/*.html
 out.html
 out.pdf
+
+src/.ipynb_checkpoints/

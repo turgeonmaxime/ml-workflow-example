@@ -14,5 +14,5 @@ My objective is containerize the first and the last step of this process. Moreov
 This can be done by running the following command from the root directory:
 
 ```bash
-Rscript src/02-initial-exploration.R data/wage_model.csv --target=wage --out=out.pdf
+Rscript src/01-initial-exploration.R data/wage_model.csv --target=wage --out=out.pdf
 ```
