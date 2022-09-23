@@ -5,8 +5,10 @@ from joblib import load
 
 app = FastAPI()
 
-column_trans = load('../artifacts/column_trans.joblib')
-final_regr = load('../artifacts/final_regr.joblib')
+# column_trans = load('../artifacts/column_trans.joblib')
+# final_regr = load('../artifacts/final_regr.joblib')
+column_trans = load('artifacts/column_trans.joblib')
+final_regr = load('artifacts/final_regr.joblib')
 
 @app.get("/predict/path/{file_path:path}")
 def predict_from_file(file_path: str):
