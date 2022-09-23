@@ -13,3 +13,4 @@ out.html
 out.pdf
 
 src/.ipynb_checkpoints/
+src/__pycache__
