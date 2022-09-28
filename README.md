@@ -55,3 +55,5 @@ docker run -d -p 5000:5000 predict
 ```
 
 The same python code as above can then be used to query the API.
+
+For a full script which takes in a set of new data in CSV file, separates into chunks, and gets predictions for each chunk, see `src/04-script-predict-newdata.py`.
