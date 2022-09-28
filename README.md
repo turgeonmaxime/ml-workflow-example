@@ -27,36 +27,31 @@ This is currently done directly in the notebook `src/02-prediction-model.ipynb`.
 
 ## 4. Make predictions for new observations
 
-This is done through an API built using [FastAPI](https://fastapi.tiangolo.com/). To start the API, run the following commands:
+This is done through an API built using [Flask](https://flask.palletsprojects.com/). To start the API, run the following commands:
 
 ```bash
 cd src
-uvicorn 04-predict-newdata:app --reload
+flask --app 04-setup-predict-api run
 ```
 
-Then you can send HTTP requests using curl (from the root directory):
+Then you can send HTTP requests using the `requests` module (from the root directory):
 
-```bash
-curl -X 'GET' \
-  'http://127.0.0.1:8000/predict/path/FULL/PATH/TO/GH-REPOSITORY/data/wage_pred.csv' \
-  -H 'accept: application/json'
+```python
+import requests
+import pandas as pd
+
+df = pd.read_csv('data/wage_pred.csv')
+
+response = requests.post('http://127.0.0.1:5000/prediction', 
+                         json = df[0:5].to_json())
+response.json()['predictions']
 ```
 
 Alternatively, you can also use the containerized version of the API. First, build and start the container:
 
 ```bash
 docker build -t predict -f predict.Dockerfile .
-docker run -d -p 8000:8000 predict
+docker run -d -p 5000:5000 predict
 ```
 
-Then you can send HTTP requests using `curl`. For example:
-
-
-``` bash
-JSON='{"year":{"0":2006},"age":{"0":18},"maritl":{"0":"1. Never Married"},"race":{"0":"1. White"},"education":{"0":"1. < HS Grad"},"region":{"0":"2. Middle Atlantic"},"jobclass":{"0":"1. Industrial"},"health":{"0":"1. <=Good"},"health_ins":{"0":"2. No"},"logwage":{"0":4.318063335},"wage":{"0":75.0431540174}}'
-
-curl -X 'GET' \
-  "http://0.0.0.0:8000/predict/json/$(echo $JSON |jq -sRr @uri)"
-
-# {"data":"{\"year\":{\"0\":2006},\"age\":{\"0\":18},\"maritl\":{\"0\":\"1. Never Married\"},\"race\":{\"0\":\"1. White\"},\"education\":{\"0\":\"1. < HS Grad\"},\"region\":{\"0\":\"2. Middle Atlantic\"},\"jobclass\":{\"0\":\"1. Industrial\"},\"health\":{\"0\":\"1. <=Good\"},\"health_ins\":{\"0\":\"2. No\"},\"logwage\":{\"0\":4.318063335},\"wage\":{\"0\":75.0431540174}}\n","predictions":[4.104193364844004]}
-```
+The same python code as above can then be used to query the API.

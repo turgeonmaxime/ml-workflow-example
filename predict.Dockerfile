@@ -10,15 +10,11 @@ COPY src/requirements.txt /app
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy files
-COPY src/04-predict-newdata.py /app
+COPY src/04-setup-predict-api.py /app
 COPY src/artifacts/column_trans.joblib /app/artifacts
 COPY src/artifacts/final_regr.joblib /app/artifacts
 
-RUN mv /app/04-predict-newdata.py /app/main.py
-
+RUN mv /app/04-setup-predict-api.py /app/main.py
 
 # Run the application
-# EXPOSE 8000
-# ENTRYPOINT ["uvicorn"]
-# CMD ["main:app"]
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5000"]
